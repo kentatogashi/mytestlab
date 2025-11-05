@@ -12,5 +12,4 @@ variable "environment" {
 variable "mgmt_account_id" {
   description = "Management account ID"
   type        = string
-  default     = "578736536528"
 }
