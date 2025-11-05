@@ -36,16 +36,19 @@ module "vpc" {
 # S3: static-web (5個)
 ########################
 
-resource "random_id" "static_suffix" {
-  count       = 5
-  byte_length = 3 # 6 hex chars
+resource "random_pet" "static_suffix" {
+  count = 5
+  length = 2
 }
 
 resource "aws_s3_bucket" "static" {
   count  = 5
-  bucket = "${var.environment}-static-web-${random_id.static_suffix[count.index].hex}"
+  bucket = "${var.environment}-static-web-${random_pet.static_suffix[count.index].id}"
   tags = {
     Environment = var.environment
+  }
+  lifecycle {
+    ignore_changes = [bucket]
   }
 }
 
@@ -63,16 +66,19 @@ resource "aws_s3_bucket_public_access_block" "static" {
 # S3: backup (5個)
 ########################
 
-resource "random_id" "backup_suffix" {
-  count       = 5
-  byte_length = 3 # 6 hex chars
+resource "random_pet" "backup_suffix" {
+  count = 5
+  length = 2
 }
 
 resource "aws_s3_bucket" "backup" {
   count  = 5
-  bucket = "${var.environment}-backup-${random_id.backup_suffix[count.index].hex}"
+  bucket = "${var.environment}-backup-${random_pet.backup_suffix[count.index].id}"
   tags = {
     Environment = var.environment
+  }
+  lifecycle {
+    ignore_changes = [bucket]
   }
 }
 
