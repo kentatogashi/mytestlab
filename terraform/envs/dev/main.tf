@@ -1,4 +1,5 @@
 terraform {
+  required_version = "~> 1.13"
   backend "s3" {
     bucket         = "20251104-my-terraform-tfstate"
     key            = "dev/terraform.tfstate"
