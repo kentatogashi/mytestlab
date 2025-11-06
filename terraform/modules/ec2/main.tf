@@ -14,18 +14,43 @@ data "aws_ami" "amazon_linux" {
   }
 }
 
-# Security Group for EC2 (SSH access from internet)
-resource "aws_security_group" "ec2_ssh" {
-  name        = "${var.environment}-${var.name_prefix}-ec2-ssh"
-  description = "Security group for ${var.name_prefix} EC2 instance with SSH access"
+# Security Group for EC2 (SSH and HTTP/HTTPS access)
+resource "aws_security_group" "ec2" {
+  name        = "${var.environment}-${var.name_prefix}-ec2"
+  description = "Security group for ${var.name_prefix} EC2 instance"
   vpc_id      = var.vpc_id
 
+  # SSH access
   ingress {
     description = "SSH from internet"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = var.allowed_ssh_cidr_blocks
+  }
+
+  # HTTP access (if enabled)
+  dynamic "ingress" {
+    for_each = var.enable_http ? [1] : []
+    content {
+      description = "HTTP from internet"
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      cidr_blocks = var.allowed_http_cidr_blocks
+    }
+  }
+
+  # HTTPS access (if enabled)
+  dynamic "ingress" {
+    for_each = var.enable_https ? [1] : []
+    content {
+      description = "HTTPS from internet"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_blocks = var.allowed_https_cidr_blocks
+    }
   }
 
   egress {
@@ -37,7 +62,7 @@ resource "aws_security_group" "ec2_ssh" {
   }
 
   tags = {
-    Name = "${var.environment}-${var.name_prefix}-ec2-ssh"
+    Name = "${var.environment}-${var.name_prefix}-ec2"
   }
 }
 
@@ -46,7 +71,7 @@ resource "aws_instance" "main" {
   ami                    = data.aws_ami.amazon_linux.id
   instance_type          = var.instance_type
   subnet_id              = var.subnet_id
-  vpc_security_group_ids = [aws_security_group.ec2_ssh.id]
+  vpc_security_group_ids = [aws_security_group.ec2.id]
   key_name               = var.key_name != "" ? var.key_name : null
 
   associate_public_ip_address = true

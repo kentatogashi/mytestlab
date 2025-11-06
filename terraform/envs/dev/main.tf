@@ -76,29 +76,39 @@ locals {
   ec2_instances = {
     web = {
       name_prefix = "web"
-      instance_type = "t3.small"
-      subnet_index = 0
-    }
-    app = {
-      name_prefix = "app"
-      instance_type = "t3.medium"
-      subnet_index = 0
-    }
-    db = {
-      name_prefix = "db"
-      instance_type = "t3.large"
-      subnet_index = 0
-    }
-    cache = {
-      name_prefix = "cache"
       instance_type = "t3.micro"
-      subnet_index = 1
+      subnet_index = 0
+      enable_http = true   # Apache用にHTTPを許可
+      enable_https = false
     }
-    worker = {
-      name_prefix = "worker"
-      instance_type = "t3.small"
-      subnet_index = 1
-    }
+//    app = {
+//      name_prefix = "app"
+//      instance_type = "t3.medium"
+//      subnet_index = 0
+//      enable_http = false
+//      enable_https = false
+//    }
+//    db = {
+//      name_prefix = "db"
+//      instance_type = "t3.large"
+//      subnet_index = 0
+//      enable_http = false
+//      enable_https = false
+//    }
+//    cache = {
+//      name_prefix = "cache"
+//      instance_type = "t3.micro"
+//      subnet_index = 1
+//      enable_http = false
+//      enable_https = false
+//    }
+//    worker = {
+//      name_prefix = "worker"
+//      instance_type = "t3.small"
+//      subnet_index = 1
+//      enable_http = false
+//      enable_https = false
+//    }
   }
 }
 
@@ -107,11 +117,13 @@ module "ec2" {
   for_each = local.ec2_instances
   source   = "../../modules/ec2"
 
-  environment         = var.environment
-  name_prefix         = each.value.name_prefix
-  vpc_id              = module.vpc.vpc_id
-  subnet_id           = module.vpc.public_subnet_ids[each.value.subnet_index]
-  instance_type       = each.value.instance_type
-  key_name            = var.ec2_key_name
+  environment             = var.environment
+  name_prefix             = each.value.name_prefix
+  vpc_id                  = module.vpc.vpc_id
+  subnet_id               = module.vpc.public_subnet_ids[each.value.subnet_index]
+  instance_type           = each.value.instance_type
+  key_name                = var.ec2_key_name
   allowed_ssh_cidr_blocks = var.ec2_allowed_ssh_cidr_blocks
+  enable_http             = lookup(each.value, "enable_http", false)
+  enable_https            = lookup(each.value, "enable_https", false)
 }

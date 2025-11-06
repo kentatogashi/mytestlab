@@ -36,6 +36,30 @@ variable "allowed_ssh_cidr_blocks" {
   default     = ["0.0.0.0/0"]
 }
 
+variable "allowed_http_cidr_blocks" {
+  description = "CIDR blocks allowed to access HTTP (port 80)"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
+variable "allowed_https_cidr_blocks" {
+  description = "CIDR blocks allowed to access HTTPS (port 443)"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
+variable "enable_http" {
+  description = "Enable HTTP access (port 80)"
+  type        = bool
+  default     = false
+}
+
+variable "enable_https" {
+  description = "Enable HTTPS access (port 443)"
+  type        = bool
+  default     = false
+}
+
 variable "additional_tags" {
   description = "Additional tags to add to the EC2 instance"
   type        = map(string)
