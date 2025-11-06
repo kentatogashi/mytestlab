@@ -151,6 +151,77 @@ VPCとサブネットを管理します。
 - `public_subnet_ids`: パブリックサブネットIDリスト
 - `private_subnet_ids`: プライベートサブネットIDリスト
 
+## EC2インスタンスへのSSH接続
+
+DEV環境には、外部からSSH接続可能なEC2インスタンスが作成されます。
+
+### 1. AWS Key Pairの作成
+
+まず、SSH接続用のAWS Key Pairを作成します：
+
+```bash
+# AWS CLIでKey Pairを作成
+aws ec2 create-key-pair \
+  --key-name dev-ec2-key \
+  --query 'KeyMaterial' \
+  --output text > dev-ec2-key.pem
+
+# 秘密鍵のパーミッションを設定
+chmod 400 dev-ec2-key.pem
+```
+
+### 2. terraform.tfvarsにKey Pair名を設定
+
+```hcl
+# envs/dev/terraform.tfvars
+ec2_key_name = "dev-ec2-key"
+ec2_instance_type = "t3.micro"  # オプション（デフォルト: t3.micro）
+```
+
+### 3. Terraform適用
+
+```bash
+cd envs/dev
+terraform plan
+terraform apply
+```
+
+### 4. EC2インスタンス情報の取得
+
+```bash
+# パブリックIPアドレスを取得
+terraform output ec2_instance_public_ip
+
+# パブリックDNS名を取得
+terraform output ec2_instance_public_dns
+
+# インスタンスIDを取得
+terraform output ec2_instance_id
+```
+
+### 5. SSH接続
+
+```bash
+# パブリックIPを使用してSSH接続
+ssh -i dev-ec2-key.pem ec2-user@<public-ip>
+
+# または、パブリックDNS名を使用
+ssh -i dev-ec2-key.pem ec2-user@<public-dns>
+```
+
+**注意事項:**
+- Amazon Linux 2のデフォルトユーザー名は `ec2-user` です
+- Security Groupでポート22（SSH）がインターネットから許可されています
+- 本番環境では、特定IPアドレスのみに制限することを推奨します
+
+### トラブルシューティング
+
+**接続できない場合:**
+1. Security Groupの設定を確認（ポート22が開放されているか）
+2. EC2インスタンスのパブリックIPが正しいか確認
+3. Key Pair名が正しく設定されているか確認
+4. 秘密鍵のパーミッションが400になっているか確認
+
 ## ベストプラクティス
 
 - ✅ 環境ごとにディレクトリを分離

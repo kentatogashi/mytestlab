@@ -47,3 +47,21 @@ variable "aws_secret_access_key" {
   sensitive   = true
 }
 
+variable "ec2_instance_type" {
+  description = "EC2 instance type"
+  type        = string
+  default     = "t3.micro"
+}
+
+variable "ec2_key_name" {
+  description = "Name of the AWS Key Pair to use for SSH access"
+  type        = string
+  default     = ""
+}
+
+variable "ec2_allowed_ssh_cidr_blocks" {
+  description = "CIDR blocks allowed to SSH to the EC2 instance"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
