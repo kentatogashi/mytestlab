@@ -47,12 +47,6 @@ variable "aws_secret_access_key" {
   sensitive   = true
 }
 
-variable "ec2_instance_type" {
-  description = "EC2 instance type"
-  type        = string
-  default     = "t3.micro"
-}
-
 variable "ec2_key_name" {
   description = "Name of the AWS Key Pair to use for SSH access"
   type        = string
