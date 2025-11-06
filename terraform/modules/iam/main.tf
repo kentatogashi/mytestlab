@@ -6,10 +6,8 @@
 # ============================================================
 #
 
-data "aws_caller_identity" "current" {}
 
 locals {
-  account_id = data.aws_caller_identity.current.account_id
 }
 
 # ------------------------------------------------------------
@@ -90,3 +88,4 @@ resource "aws_iam_role_policy_attachment" "readonly_attach" {
 # Terraform実行用のロール、ポリシー、ユーザーは手動または
 # 別の管理方法で作成・管理してください
 # ------------------------------------------------------------
+

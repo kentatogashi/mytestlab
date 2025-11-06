@@ -13,6 +13,7 @@ override.tf.json
 .terraformrc
 terraform.rc
 !terraform.lock.hcl
+*.pem
 
 # Terraform variable files (may contain sensitive data)
 *.tfvars

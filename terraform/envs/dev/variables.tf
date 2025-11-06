@@ -59,3 +59,8 @@ variable "ec2_allowed_ssh_cidr_blocks" {
   default     = ["0.0.0.0/0"]
 }
 
+variable "sns_notification_email" {
+  description = "Email address for EC2 status check notifications"
+  type        = string
+  default     = ""
+}
