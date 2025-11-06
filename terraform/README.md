@@ -238,3 +238,50 @@ ssh -i dev-ec2-key.pem ec2-user@<public-dns>
 - バックエンド設定（S3バケット）は事前に作成しておく必要があります
 - IAMリソースは環境ごとに名前が重複しないように環境名が付与されます
 
+## Terraform実行ユーザーに必要なIAM権限
+
+Terraformを実行するIAMユーザー（例: `terraform-ci`）には、以下の権限が必要です：
+
+### CloudWatch Logs権限
+
+CloudWatch Logsを使用する場合、以下の権限が必要です：
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams",
+        "logs:DeleteLogGroup",
+        "logs:PutRetentionPolicy"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+### 権限の付与方法
+
+AWS CLIまたはAWSコンソールで、`terraform-ci`ユーザーに上記のポリシーをアタッチしてください：
+
+```bash
+# ポリシーを作成
+aws iam create-policy \
+  --policy-name CloudWatchLogsFullAccess \
+  --policy-document file://cloudwatch-logs-policy.json
+
+# ユーザーにポリシーをアタッチ
+aws iam attach-user-policy \
+  --user-name terraform-ci \
+  --policy-arn arn:aws:iam::ACCOUNT_ID:policy/CloudWatchLogsFullAccess
+```
+
+または、管理アカウントで`AdministratorAccess`ポリシーを付与している場合は、その権限でCloudWatch Logsも操作できます。
+

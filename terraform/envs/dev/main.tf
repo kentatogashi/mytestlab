@@ -103,6 +103,21 @@ locals {
   }
 }
 
+########################
+# CloudWatch Logs for EC2
+########################
+
+# CloudWatch Log Group for EC2 logs
+resource "aws_cloudwatch_log_group" "ec2_logs" {
+  name              = "${var.environment}-ec2-logs"
+  retention_in_days = 7  # 無料枠内で使用（7日間保持）
+
+  tags = {
+    Name        = "${var.environment}-ec2-logs"
+    Environment = var.environment
+  }
+}
+
 # 用途ごとのEC2インスタンスを作成
 module "ec2" {
   for_each = local.ec2_instances
@@ -117,6 +132,7 @@ module "ec2" {
   allowed_ssh_cidr_blocks = var.ec2_allowed_ssh_cidr_blocks
   enable_http             = lookup(each.value, "enable_http", false)
   enable_https            = lookup(each.value, "enable_https", false)
+  cloudwatch_log_group_name = aws_cloudwatch_log_group.ec2_logs.name
 }
 
 ########################

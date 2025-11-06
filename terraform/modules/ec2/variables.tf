@@ -66,3 +66,9 @@ variable "additional_tags" {
   default     = {}
 }
 
+variable "cloudwatch_log_group_name" {
+  description = "CloudWatch Log Group name for EC2 logs"
+  type        = string
+  default     = ""
+}
+
