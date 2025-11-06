@@ -14,3 +14,10 @@ override.tf.json
 terraform.rc
 !terraform.lock.hcl
 
+# Terraform variable files (may contain sensitive data)
+*.tfvars
+*.tfvars.json
+
+# Environment-specific variable files
+envs/*/terraform.tfvars
+
